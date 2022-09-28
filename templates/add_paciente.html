@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <spam aria-hidden="true">&times;</spam>
+        </div>
+        
+    {% endfor %}
+
+
+    {% if name %}
+        <h1>Paciente Added! </h1>
+        {% for our_paciente in our_pacientes %}
+        {{ our_paciente.id_paciente  }}. {{ our_paciente.DNI }}. 
+        {{ our_paciente.nombre }}. {{ our_paciente.apellido }}.
+        {{ our_paciente.nro_seguro }}
+        <br/>
+        {% endfor %}
+        <br/>
+    {% else %}
+        <h1>Paciente List: </h1>
+        <br/>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.DNI.label(class="form-label") }}
+            {{ form.DNI(class="form-control") }}
+            <br/>
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control") }}
+            <br/>
+            {{ form.apellido.label(class="form-label") }}
+            {{ form.apellido(class="form-control") }}
+            <br/>
+            {{ form.nro_seguro .label(class="form-label") }}
+            {{ form.nro_seguro(class="form-control") }}
+            <br/>
+
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                  <th scope="col">ID Paciente</th>
+                  <th scope="col">DNI</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Apellido</th>
+                  <th scope="col">Nro Seguro</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr>
+                {% for our_paciente in our_pacientes %}
+                  <th scope="row">{{ our_paciente.id_paciente  }}</th>
+                  <td>{{ our_paciente.DNI }}</td>
+                  <td>{{ our_paciente.nombre }}</td>
+                  <td>{{ our_paciente.apellido }}</td>
+                  <td>{{ our_paciente.nro_seguro }}</td>
+                  <td><button type="button" href="{{ url_for('deletepaciente', id_paciente=our_paciente.id_paciente) }}" class="btn btn-danger">Delete</button></td>
+                </tr>
+                {% endfor %}  
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}
+

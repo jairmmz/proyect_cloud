@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <spam aria-hidden="true">&times;</spam>
+        </div>
+        
+    {% endfor %}
+
+
+    {% if name %}
+        <h1>Doctor Added! </h1>
+        {% for our_doctor in our_doctors %}
+        {{ our_doctor.id_doctor }}. {{ our_doctor.DNI }}.
+        {{ our_doctor.nombre }}. {{ our_doctor.apellido }}. {{ our_doctor.especialidad }} <br/>
+        {% endfor %}
+        <br/>
+    {% else %}
+        <h1>Doctor List: </h1>
+        <br/>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <br/>
+            {{ form.DNI.label(class="form-label") }}
+            {{ form.DNI(class="form-control") }}
+            <br/>
+            
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control") }}
+            <br/>
+            {{ form.apellido.label(class="form-label") }}
+            {{ form.apellido(class="form-control") }}
+            <br/>
+            {{ form.especialidad.label(class="form-label") }}
+            {{ form.especialidad(class="form-control") }}
+            <br/>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+
+        <br>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                  <th scope="col">ID Doctor</th>
+                  <th scope="col">Dni</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Apellido</th>
+                  <th scope="col">Especialidad</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr>
+                {% for our_doctor in our_doctors %}
+                  <th scope="row">{{ our_doctor.id_doctor }}</th>
+                  <td>{{ our_doctor.DNI }}</td>
+                  <td>{{ our_doctor.nombre }}</td>
+                  <td>{{ our_doctor.apellido }}</td>
+                  <td>{{ our_doctor.especialidad }}</td>
+                  <td><button type="button" href="{{ url_for('deletedoctor', id_doctor=our_doctor.id_doctor) }}" class="btn btn-danger">Delete</button></td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}
+

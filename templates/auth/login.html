@@ -1,0 +1,42 @@
+{% extends 'base_auth.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    {% endfor %}
+
+    {% if name %}
+    <h1>Bienvenido Al Sistema</h1>
+    <br/>
+    {% else %}
+    <br/>
+    <div class="shadow w-50 bg-body rounded text-center m-lg-auto">
+        <main class="form-signin">
+            <div class="text-center">
+                <img class="mb tex" src="/static/images/loginpng.png" alt="" width="150" height="100">
+                <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+            </div>
+
+            <form class="form-signin mb-4" method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+                <br/>
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control", type="password") }}
+                <br/>
+                <div class="text-center">{{ form.submit(class="btn btn-secondary") }}</div>
+            </form>   
+        </main>
+    </div>
+
+{% endif %}
+
+{% endblock %}

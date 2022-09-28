@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <spam aria-hidden="true">&times;</spam>
+        </div>
+        
+    {% endfor %}
+
+
+    {% if name %}
+        <h1>Registro Added! </h1>
+        {% for our_registro in our_registros %}
+        {{ our_registro.id_registro }}. {{ our_registro.id_doctor }}. 
+        {{ our_registro.id_paciente }}. {{ our_registro.id_consulta }}
+        <br/>
+        {% endfor %}
+        <br/>
+    {% else %}
+        <h1>Registro List: </h1>
+        <br/>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.id_doctor.label(class="form-label") }}
+            {{ form.id_doctor(class="form-control") }}
+            <br/>
+            {{ form.id_paciente.label(class="form-label") }}
+            {{ form.id_paciente(class="form-control") }}
+            <br/>
+            {{ form.id_consulta.label(class="form-label") }}
+            {{ form.id_consulta(class="form-control") }}
+            <br/>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form> 
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                  <th scope="col">ID Registro</th>
+                  <th scope="col">Doctor</th>
+                  <th scope="col">Paciente</th>
+                  <th scope="col">Consulta</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr>
+                {% for our_registro in our_registros %}
+                  <th scope="row">{{ our_registro.id_registro }}</th>
+                  <td>{{ our_registro.id_doctor }}</td>
+                  <td>{{ our_registro.id_paciente }}</td>
+                  <td>{{ our_registro.id_consulta   }}</td>
+                  <td><button type="button" href="{{ url_for('deleteregistro', id_registro=our_registro.id_registro) }}" class="btn btn-danger">Delete</button></td>
+                </tr>
+                {% endfor %}  
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}
+
