@@ -25,14 +25,14 @@
         <br/>
         <form method="POST">
             {{ form.hidden_tag() }}
-            {{ form.descripcion_consulta.label(class="form-label") }}
+            {{ form.descripcion_consulta.label(class="form-label",id="descripcion_consulta", name="descripcion_consulta") }}
             {{ form.descripcion_consulta(class="form-control") }}
             <br/>
-            {{ form.id_doctor.label(class="form-label") }}
-            {{ form.id_doctor(class="form-control") }}
+            {{ form.id_doctor.label() }}
+            {{ form.id_doctor() }}
             <br/>
-            {{ form.id_paciente.label(class="form-label") }}
-            {{ form.id_paciente(class="form-control") }}
+            {{ form.id_paciente.label() }}
+            {{ form.id_paciente() }}
             <br/>
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
@@ -48,12 +48,12 @@
               </thead>
             <tbody>
                 <tr>
-                {% for our_consulta in our_consultas %}
-                  <th scope="row">{{ our_consulta.id_consulta }}</th>
-                  <td>{{ our_consulta.descripcion_consulta }}</td>
-                  <td>{{ our_consulta.id_doctor }}</td>
-                  <td>{{ our_consulta.id_paciente }}</td>
-                  <td><button type="button" href="{{ url_for('deletecunsulta', id_consulta=our_course.id_consulta) }}" class="btn btn-danger">Delete</button></td>
+                {% for our_consultas in our_consultas %}
+                  <th scope="row">{{ our_consultas.id_consulta }}</th>
+                  <td>{{ our_consultas.descripcion_consulta }}</td>
+                  <td>{{ our_consultas.id_doctor }}</td>
+                  <td>{{ our_consultas.id_paciente }}</td>
+                  <td><button type="button" href="{{ url_for('deletecunsulta', id_consulta=our_consultas.id_consulta) }}" class="btn btn-danger">Delete</button></td>
                 </tr>
                 {% endfor %}  
             </tbody>

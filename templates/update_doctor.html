@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+    {% endfor %}
+    
+{% if nombre %}
+        <h1>Doctor update!</h1>
+        <br>
+    {% else %}
+        <h1>Doctor update...</h1>
+        <br/>
+        <div class="shadow p-3 mb-5 bg-body rounded">
+        <form action="/doctor/update/{{  name_update.id_doctor }}" method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.DNI.label(class="form-label") }}
+            {{ form.DNI(class="form-control", value=name_update.DNI) }}
+            <br/>
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control", value=name_update.nombre) }}
+            <br/>
+            {{ form.apellido.label(class="form-label") }}
+            {{ form.apellido(class="form-control", value=name_update.apellido) }}
+            <br/>
+            {{ form.especialidad.label(class="form-label") }}
+            {{ form.especialidad(class="form-control", value=name_update.especialidad) }}
+            <br/>
+            {{ form.submit(class="btn btn-primary") }}
+            <a class="btn btn-danger" href="{{ url_for('add_doctor') }}">Cancel</a>
+        </form>
+        </div>
+        <br>
+    {% endif %}
+
+{% endblock %}

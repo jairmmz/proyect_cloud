@@ -4,6 +4,8 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, InputRequired
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from wtforms_sqlalchemy.fields import QuerySelectField
+
 from datetime import datetime
 
 
@@ -12,11 +14,11 @@ from datetime import datetime
 app=Flask(__name__)
 
 # Aff database
-app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root@localhost/proyecto'
-#app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://admin:gafqbm1cipi!@database-1.c5gtowjq1igh.us-east-1.rds.amazonaws.com/Examen'
+app.config['SQLALCHEDATABASE_URI']='mysql+pymysql://root@localhost/proyecto'
+# app.config['SQLALCHEDATABASE_URI']='mysql+pymysql://admin:12345678@examen.cq0gfpvzpkra.us-east-1.rds.amazonaws.com/proyecto'
 #Secret key
 app.config['SECRET_KEY']='My super secret taht no one is supposed to know'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHETRACK_MODIFICATIONS'] = False
 
 #Initializa the DataBase
 db=SQLAlchemy(app)
@@ -52,6 +54,9 @@ class Doctor(db.Model):
     def __repr__(self):
         return '<Nombre %r>'% self.nombre
 
+def choice_query_doctor():
+    return Doctor.query
+
 # Create form class
 class DoctorForm(FlaskForm):
     DNI=StringField("DNI: ", validators=[DataRequired()])
@@ -72,6 +77,9 @@ class Paciente(db.Model):
     #Create a String
     def __repr__(self):
         return '<Nombre %r>'% self.nombre
+
+def choice_query_paciente():
+    return Paciente.query
 
 # Create form class
 class PacienteForm(FlaskForm):
@@ -94,11 +102,14 @@ class Consulta(db.Model):
     def __repr__(self):
         return '<id_estudiante %r>'% self.id_estudiante
 
+def choice_query_consulta():
+    return Consulta.query
+
 # Create form class
 class ConsultaForm(FlaskForm):
     descripcion_consulta=StringField("Descripcion de la Consulta: ", validators=[DataRequired()])
-    id_doctor=StringField("Doctor: ", validators=[DataRequired()])
-    id_paciente=StringField("Paciente: ", validators=[DataRequired()])
+    id_doctor=QuerySelectField("Nombre de doctor: ", query_factory=choice_query_doctor, allow_blank=True, get_label='nombre', validators=[InputRequired()])
+    id_paciente=QuerySelectField("Nombre de paciente: ", query_factory=choice_query_paciente, allow_blank=True, get_label='nombre', validators=[InputRequired()])
     submit=SubmitField('Submit')
 
 #Create Model
@@ -176,22 +187,27 @@ def add_paciente():
 # Create add Course
 @app.route('/consulta/add', methods=['GET','POST'])
 def add_consulta():
-    descripcion_consulta = None
     form = ConsultaForm()
+    # descripcion_consulta = None
     if form.validate_on_submit():
-        consultas=Consulta.query.filter_by(descripcion_consulta=form.descripcion_consulta.data).first()
-        if form.validate_on_submit():
-            consultas=Consulta(descripcion_consulta=form.descripcion_consulta.data, id_doctor=form.id_doctor.data, id_paciente =form.id_paciente.data)
-            db.session.add(consultas)
+        my_descripcion_consulta = request.form.get('descripcion_consulta')
+        my_id_doctor = request.form.get('id_doctor')
+        my_id_paciente = request.form.get('id_paciente')
+        # consultas=Consulta.query.filter_by(descripcion_consulta=form.descripcion_consulta.data).first()
+        consulta=Consulta(my_descripcion_consulta, my_id_doctor, my_id_paciente)
+
+        if my_descripcion_consulta == "__None" or my_id_doctor == "__None" or my_id_paciente == "__None":
+            flash("Se requiere llenar los campos!")
+        else:
+            db.session.add(consulta)
             db.session.commit()
-        descripcion_consulta=form.descripcion_consulta.data
-        form.id_doctor.data=''
-        form.id_paciente.data=''
-    our_consultas=Consulta.query.order_by(Consulta.date_added)
-    return render_template('add_consulta.html',
-    form=form,
-    descripcion_consulta=descripcion_consulta,
-    our_consultas=our_consultas)
+            form.descripcion_consulta=''
+            form.id_doctor.data=''
+            form.id_paciente.data=''
+            flash("La consulta se a realizado correctamente!")
+            return redirect('consulta/add')
+    our_consultas=Consulta.query.order_by(Consulta.id_consulta)
+    return render_template('add_consulta.html',form=form, our_consultas=our_consultas)
 
 #Create add Schools
 @app.route('/registro/add', methods=['GET','POST'])
@@ -214,6 +230,26 @@ def add_registro():
     form=form,
     id_doctor=id_doctor,
     our_registros=our_registros)
+    
+# Update Doctor
+@app.route('/doctor/update/<int:id_doctor>', methods=['GET', 'POST'])
+def update_doctor(id_doctor):
+    form = DoctorForm()
+    name_update = Doctor.query.get_or_404(id_doctor)
+    if request.method == "POST":   
+        name_update.DNI = request.form['DNI']
+        name_update.nombre = request.form['nombre']
+        name_update.apellido = request.form['apellido']
+        name_update.especialidad = request.form['especialidad']
+        try:
+            db.session.commit()
+            flash("Se a actualizado satisfactoriamente!")
+            return redirect('/doctor/add')
+        except:
+            flash("Error! in update Doctor!")
+            return render_template('update_doctor.html', form=form, name_update=name_update)
+    else:
+        return render_template('update_doctor.html', form=form, name_update=name_update)
 
 #Delete Matricula
 @app.route('/deletedoctor/<id_doctor>')
