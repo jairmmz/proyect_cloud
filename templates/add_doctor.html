@@ -29,10 +29,11 @@
             {{ form.DNI.label(class="form-label") }}
             {{ form.DNI(class="form-control") }}
             <br/>
-            
+            <div class="w-50">
             {{ form.nombre.label(class="form-label") }}
             {{ form.nombre(class="form-control") }}
             <br/>
+            </div>
             {{ form.apellido.label(class="form-label") }}
             {{ form.apellido(class="form-control") }}
             <br/>
@@ -43,7 +44,7 @@
         </form>
 
         <br><br><br><br>
-        <table class="table table-hover">
+        <table id="data" class="table table-dark">
             <thead>
                 <tr>    
                   <th scope="col">ID Doctor</th>
@@ -64,7 +65,7 @@
 
                     <td>
                         <a class="btn btn-primary" href="{{ url_for('update_doctor', id_doctor = our_doctor.id_doctor) }}">Update</a>
-                    <button type="button" href="{{ url_for('deletedoctor', id_doctor=our_doctor.id_doctor) }}" class="btn btn-danger">Delete</button>
+                        <a class="btn btn-danger" href="{{ url_for('deletedoctor', id_doctor = our_doctor.id_doctor) }}">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}

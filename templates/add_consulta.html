@@ -3,12 +3,13 @@
 {% block content %}
 
     {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <spam aria-hidden="true">&times;</spam>
-        </div>
-        
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
     {% endfor %}
 
 
@@ -25,25 +26,27 @@
         <br/>
         <form method="POST">
             {{ form.hidden_tag() }}
-            {{ form.descripcion_consulta.label(class="form-label",id="descripcion_consulta", name="descripcion_consulta") }}
+            {{ form.descripcion_consulta.label(class="form-label") }}
             {{ form.descripcion_consulta(class="form-control") }}
             <br/>
-            {{ form.id_doctor.label() }}
-            {{ form.id_doctor() }}
+            {{ form.id_doctor.label(class="form-label") }}
+            {{ form.id_doctor(class="form-control") }}
             <br/>
-            {{ form.id_paciente.label() }}
-            {{ form.id_paciente() }}
+            {{ form.id_paciente.label(class="form-label") }}
+            {{ form.id_paciente(class="form-control") }}
             <br/>
             <br/>
-            {{ form.submit(class="btn btn-secondary") }}
+            {{ form.submit(class="btn btn-primary") }}
         </form>
-        <table class="table table-hover">
+        <br><br>
+        <table id="data" class="table table-dark">
             <thead>
                 <tr>
                   <th scope="col">ID Consulta</th>
                   <th scope="col">Descripción Consulta</th>
                   <th scope="col">Doctor</th>
                   <th scope="col">Paciente</th>
+                  <th scope="col">Acción</th>
                 </tr>
               </thead>
             <tbody>
@@ -53,7 +56,11 @@
                   <td>{{ our_consultas.descripcion_consulta }}</td>
                   <td>{{ our_consultas.id_doctor }}</td>
                   <td>{{ our_consultas.id_paciente }}</td>
-                  <td><button type="button" href="{{ url_for('deletecunsulta', id_consulta=our_consultas.id_consulta) }}" class="btn btn-danger">Delete</button></td>
+                  <td>
+
+                      <a class="btn btn-primary" href="{{ url_for('update_consulta', id_consulta=our_consultas.id_consulta) }}">Update</a>
+                      <a class="btn btn-danger" href="{{ url_for('deleteconsulta', id_consulta=our_consultas.id_consulta) }}">Delete</a>
+                  </td>
                 </tr>
                 {% endfor %}  
             </tbody>

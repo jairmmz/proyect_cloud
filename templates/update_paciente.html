@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+{% endfor %}
+
+{% if nombre %}
+        <h1>Paciente update!</h1>
+        <br>
+    {% else %}
+        <h1>Paciente update...</h1>
+        <form action="/paciente/update/{{ name_update.id_paciente }}" method="POST">
+            <div class="form-group">
+                <label for="DNI">DNI</label>
+                <input type="text" class="form-control" id="DNI" name="DNI" value="{{ name_update.DNI }}">
+            </div>
+            <div class="form-group">
+                <label for="nombre">nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ name_update.nombre }}">
+            </div>
+            <div class="form-group">
+                <label for="apellido">apellido</label>
+                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ name_update.apellido }}">
+            </div> 
+            <div class="form-group">
+                <label for="nro_seguro">nro_seguro</label>
+                <input type="text" class="form-control" id="nro_seguro" name="nro_seguro" value="{{ name_update.nro_seguro }}">
+            </div>  
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-danger" href="{{ url_for('add_paciente') }}">Cancel</a>
+        </form>
+        </div>
+        <br>
+    {% endif %}
+
+{% endblock %}
