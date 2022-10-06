@@ -3,12 +3,13 @@
 {% block content %}
 
     {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <spam aria-hidden="true">&times;</spam>
-        </div>
-        
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
     {% endfor %}
 
 
@@ -26,20 +27,27 @@
         <br/>
         <form method="POST">
             {{ form.hidden_tag() }}
-            {{ form.DNI.label(class="form-label", type="number") }}
+            <div class="w-50">
+            <b>{{ form.DNI.label(class="form-label", type="number") }}</b>
             {{ form.DNI(class="form-control") }}
             <br/>
-            {{ form.nombre.label(class="form-label") }}
+            </div>
+            <div class="w-50">
+            <b>{{ form.nombre.label(class="form-label") }}</b>
             {{ form.nombre(class="form-control") }}
             <br/>
-            {{ form.apellido.label(class="form-label") }}
+            </div>
+            <div class="w-50">
+            <b>{{ form.apellido.label(class="form-label") }}</b>
             {{ form.apellido(class="form-control") }}
             <br/>
-            {{ form.nro_seguro .label(class="form-label") }}
+            </div>
+            <div class="w-50">
+            <b>{{ form.nro_seguro .label(class="form-label") }}</b>
             {{ form.nro_seguro(class="form-control") }}
             <br/>
-
-            {{ form.submit(class="btn btn-secondary") }}
+            </div>
+            {{ form.submit(class="btn btn-secondary") }}</b>
         </form>
         <br><br>
         <table id="data" class="table table-dark">

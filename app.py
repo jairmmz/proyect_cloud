@@ -1,22 +1,21 @@
-from symbol import except_clause
 from flask import Flask, render_template, flash, request, redirect, url_for
 from flask_wtf import FlaskForm 
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, DateTimeLocalField, validators
 from wtforms.validators import DataRequired, InputRequired
-from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy_report import Reporter
 from wtforms_sqlalchemy.fields import QuerySelectField
-
+from sqlalchemy import create_engine, MetaData, Table
 from datetime import datetime
-
-
-#https://wtforms.readthedocs.io/en/3.0.c/forms/
 
 app=Flask(__name__)
 
 # Aff database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:12345678@examen.cq0gfpvzpkra.us-east-1.rds.amazonaws.com/proyecto'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:alonzo123X@database-1.crx15og5b3ep.us-east-1.rds.amazonaws.com/proyecto'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/proyecto'
+
+engine = create_engine('mysql+pymysql://admin:alonzo123X@database-1.crx15og5b3ep.us-east-1.rds.amazonaws.com/proyecto')
+metadata = MetaData(bind=engine)
 
 # Secret key
 app.config['SECRET_KEY'] = 'My super secret that no one is supposed to know'
@@ -34,8 +33,10 @@ class User(db.Model):
     password=db.Column(db.String(250), nullable=False)
     fullname=db.Column(db.String(250), nullable=False)
     #Create a String
-    def __repr__(self):
-        return '<Nombre %r>'% self.username
+    def __init__(self, username, password, fullname):
+        self.username=username
+        self.password=password
+        self.fullname=fullname
         
 # Create form class
 class UserForm(FlaskForm):
@@ -54,8 +55,11 @@ class Doctor(db.Model):
     especialidad=db.Column(db.String(250), nullable=False)
     date_added=db.Column(db.DateTime, default=datetime.utcnow)
     #Create a String
-    def __repr__(self):
-        return '<Nombre %r>'% self.nombre
+    def __init__(self, DNI, nombre, apellido, especialidad):
+        self.DNI=DNI
+        self.nombre=nombre
+        self.apellido=apellido
+        self.especialidad=especialidad
 
 def choice_query_doctor():
     return Doctor.query
@@ -78,8 +82,11 @@ class Paciente(db.Model):
     nro_seguro =db.Column(db.String(50), nullable=False)
     date_added=db.Column(db.DateTime, default=datetime.utcnow)
     #Create a String
-    def __repr__(self):
-        return '<Nombre %r>'% self.nombre
+    def __init__(self, DNI, nombre, apellido, nro_seguro):
+        self.DNI=DNI
+        self.nombre=nombre
+        self.apellido=apellido
+        self.nro_seguro=nro_seguro
 
 def choice_query_paciente():
     return Paciente.query
@@ -99,11 +106,18 @@ class Consulta(db.Model):
     descripcion_consulta=db.Column(db.String(120), nullable=False)
     id_doctor=db.Column(db.Integer, db.ForeignKey('doctor.id_doctor'), nullable=False)
     id_paciente=db.Column(db.Integer, db.ForeignKey('paciente.id_paciente'), nullable=False)
-    date_added=db.Column(db.DateTime, default=datetime.utcnow)
+    reserva_fecha_consulta=db.Column(db.DateTime, nullable=False)
     
+    # Aqui pasamos el nombre de las clases y no el nombre de la tabla
+    doctor = db.relationship('Doctor')
+    paciente = db.relationship('Paciente')
+
     #Create a String
-    def __repr__(self):
-        return '<id_estudiante %r>'% self.id_estudiante
+    def __init__(self,descripcion_consulta, id_doctor, id_paciente, reserva_fecha_consulta):
+        self.descripcion_consulta=descripcion_consulta
+        self.id_doctor=id_doctor
+        self.id_paciente=id_paciente
+        self.reserva_fecha_consulta=reserva_fecha_consulta
 
 def choice_query_consulta():
     return Consulta.query
@@ -111,36 +125,40 @@ def choice_query_consulta():
 # Create form class
 class ConsultaForm(FlaskForm):
     descripcion_consulta=StringField("Descripcion de la Consulta: ", validators=[InputRequired()])
-    id_doctor=StringField("Doctor: ", validators=[InputRequired()])
-    id_paciente=StringField("Paciente: ", validators=[InputRequired()])
+    # id_doctor=StringField("Doctor: ", validators=[InputRequired()])
+    # id_paciente=StringField("Paciente: ", validators=[InputRequired()])
+    id_doctor = QuerySelectField("Nombre del Doctor: ", query_factory=choice_query_doctor, allow_blank=True, get_label='nombre', validators=[InputRequired()])
+    id_paciente = QuerySelectField("Nombre del Paciente: ", query_factory=choice_query_paciente, allow_blank=True,get_label='nombre', validators=[InputRequired()])
+    reserva_fecha_consulta=DateTimeLocalField('Fecha de Reserva: ', format='%Y-%m-%dT%H:%M', validators=[InputRequired()])
     submit=SubmitField('Submit')
 
-#Create Model
-class Registro_consulta(db.Model):
-    __tablename__ = 'registro_consulta'
+#Create Model Registro
+class Registro(db.Model):
+    __tablename__ = 'registro'
     id_registro=db.Column(db.Integer, primary_key=True)
-    id_doctor=db.Column(db.Integer, db.ForeignKey('doctor.id_doctor'), nullable=False)
-    id_paciente=db.Column(db.Integer, db.ForeignKey('paciente.id_paciente'), nullable=False)
-    id_consulta=db.Column(db.Integer, db.ForeignKey('consulta.id_consulta'), nullable=False)
-    date_added=db.Column(db.DateTime, default=datetime.utcnow)
+    descripcion_consulta=db.Column(db.String(120), nullable=False)
+    name_doctor=db.Column(db.String(50), nullable=False)
+    name_paciente=db.Column(db.String(50), nullable=False)
+    reserva_fecha=db.Column(db.DateTime, nullable=False)
+
     #Create a String
-    def __repr__(self):
-        return '<Nombre %r>'% self.nombre
-    
-# Create form class
-class NamerForm(FlaskForm):
-    id_doctor=StringField("Doctor: ", validators=[DataRequired()])
-    apellidos=StringField("Apellidos: ", validators=[DataRequired()])
-    id_paciente=StringField("Paciente: ", validators=[DataRequired()])
-    id_consulta=StringField("Consulta: ", validators=[DataRequired()])
-    submit=SubmitField('Submit')
+    def __init__(self, descripcion_consulta, name_doctor, name_paciente, reserva_fecha):
+        self.descripcion_consulta=descripcion_consulta
+        self.name_doctor=name_doctor
+        self.name_paciente=name_paciente
+        self.reserva_fecha=reserva_fecha
+
+def choice_query_registro():
+    return Registro.query
 
 # Create form class
 class RegistroForm(FlaskForm):
-    id_doctor=StringField("Doctor: ", validators=[DataRequired()])
-    id_paciente=StringField("Paciente: ", validators=[DataRequired()])
-    id_consulta=StringField("Consulta: ", validators=[DataRequired()])
+    descripcion_consulta=StringField("Descripcion de la Consulta: ")
+    name_doctor =StringField("Nombre del Doctor: ")
+    name_paciente = StringField("Nombre del Paciente: ")
+    reserva_fecha=DateTimeLocalField('Fecha de Reserva: ', format='%Y-%m-%dT%H:%M')
     submit=SubmitField('Submit')
+    
 
 # Create Add Tuition
 @app.route('/doctor/add', methods=['GET','POST'])
@@ -189,39 +207,44 @@ def add_paciente():
 def add_consulta():
     descripcion_consulta = None
     form = ConsultaForm()
+    form_registro = RegistroForm()
     if form.validate_on_submit():
-        consultas=Consulta.query.filter_by(descripcion_consulta=form.descripcion_consulta.data).first()
-        if form.validate_on_submit():
-            consultas=Consulta(descripcion_consulta=form.descripcion_consulta.data, id_doctor=form.id_doctor.data, id_paciente =form.id_paciente.data)
-            db.session.add(consultas)
+        
+        my_descripcion_consulta = request.form.get('descripcion_consulta')
+        my_idDoctor = request.form.get('id_doctor')
+        my_idPaciente = request.form.get('id_paciente')
+        my_fecha_reserva = request.form.get('reserva_fecha_consulta')
+        
+        # descripcion = request.form.get('descripcion_consulta')
+        # nameDoctor = request.form.get('id_doctor')
+        # namePaciente = request.form.get('id_paciente')
+        # fecha_reserva = request.form.get('reserva_fecha_consulta')
+        
+        consulta = Consulta(my_descripcion_consulta, my_idDoctor, my_idPaciente, my_fecha_reserva)
+        # registro = Registro(my_descripcion_consulta, my_idDoctor, my_idPaciente, my_fecha_reserva)
+        
+        # registro=Registro(descripcion=form.descripcion_consulta.data, nameDoctor=form.id_doctor.data, namePaciente=form.id_paciente.data, fecha_reserva=form.reserva_fecha_consulta.data)
+        
+        if my_idDoctor == "__None" or my_idPaciente == "__None":
+            flash("Se requiere llenar los campos!")
+        else:
+            db.session.add(consulta)
+            # db.session.add(registro)
             db.session.commit()
-        descripcion_consulta=form.descripcion_consulta.data
-        form.id_doctor.data=''
-        form.id_paciente.data=''
-    our_consultas=Consulta.query.order_by(Consulta.date_added)
-    return render_template('add_consulta.html',
-    form=form, descripcion_consulta=descripcion_consulta, our_consultas=our_consultas)
 
-#Create add Schools
-@app.route('/registro/add', methods=['GET','POST'])
-def add_registro():
-    id_doctor= None
-    form = RegistroForm()
-    if form.validate_on_submit():
-        registros=Registro_consulta.query.filter_by(id_doctor=form.id_doctor.data).first()
-        if form.validate_on_submit():
-            registros=Registro_consulta(id_doctor=form.id_doctor.data, id_paciente=form.id_paciente.data, id_consulta=form.id_consulta.data)
-            db.session.add(registros)
-            db.session.commit()
-            id_doctor=form.id_doctor.data
+            descripcion_consulta=form.descripcion_consulta.data
+            form.descripcion_consulta.data=''
             form.id_doctor.data=''
             form.id_paciente.data=''
-            form.id_consulta.data=''
-            flash("Registrer Add Successfully!")
-    our_registros=Registro_consulta.query.order_by(Registro_consulta.date_added)
-    return render_template('add_registro.html',
-    form=form,id_doctor=id_doctor, our_registros=our_registros)
+            form.reserva_fecha_consulta.data=''
+            flash("La consulta se ha realizado correctamente!")
+    # our_consultas=Consulta.query.order_by(Consulta.id_consulta)
+    # our_consultas=db.session.query(Consulta, Doctor, Paciente).join(Consulta.id_consulta,Consulta.doctor, Consulta.paciente).order_by(Consulta.id_consulta).all()
+    our_consultas=engine.execute('select id_consulta,descripcion_consulta,doctor.nombre as nombre_doc,paciente.nombre as nombre, reserva_fecha_consulta from doctor inner join consulta  on doctor.id_doctor=consulta.id_doctor inner join paciente on paciente.id_paciente=consulta.id_paciente')
+    return render_template('add_consulta.html',
+    form=form, descripcion_consulta=descripcion_consulta, our_consultas=our_consultas)
     
+ 
 # Update Doctor
 @app.route('/doctor/update/<int:id_doctor>', methods=['GET', 'POST'])
 def update_doctor(id_doctor):
@@ -275,18 +298,6 @@ def deletedoctor(id_doctor):
         flash ("Ops! There was a problem from deleted Doctor!")        
     return render_template('/doctor/add')
 
-#Delete Estuadiante
-@app.route('/deleteregistro/<id_registro>')
-def deletepacientex(id_registro):
-    registros=Registro_consulta.query.get(id_registro)
-    try:
-        db.session.delete(registros)
-        db.session.commit()
-        flash ("El registrro se ha eliminado correctamente!")
-        return redirect("'/registro/add")
-    except:
-        flash ("Ops! There was a problem from deleted Registrer!")  
-    return render_template('/registro/add')
 
 # DELETE PACIENTE
 @app.route('/paciente/update/<int:id_paciente>', methods=['GET','POST'])

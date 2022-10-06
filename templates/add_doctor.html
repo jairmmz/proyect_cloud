@@ -25,22 +25,27 @@
         <br/>
         <form method="POST">
             {{ form.hidden_tag() }}
-            <br/>
-            {{ form.DNI.label(class="form-label") }}
+            <div class="w-50">
+            <b class="b-color">{{ form.DNI.label(class="form-label") }}</b>
             {{ form.DNI(class="form-control") }}
             <br/>
+            </div>
             <div class="w-50">
-            {{ form.nombre.label(class="form-label") }}
+            <b class="b-color">{{ form.nombre.label(class="form-label") }}</b>
             {{ form.nombre(class="form-control") }}
             <br/>
             </div>
-            {{ form.apellido.label(class="form-label") }}
+            <div class="w-50">
+            <b class="b-color">{{ form.apellido.label(class="form-label") }}</b>
             {{ form.apellido(class="form-control") }}
             <br/>
-            {{ form.especialidad.label(class="form-label") }}
+            </div>
+            <div class="w-50">
+            <b class="b-color">{{ form.especialidad.label(class="form-label") }}</b>
             {{ form.especialidad(class="form-control") }}
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
+            </div>
         </form>
 
         <br><br><br><br>

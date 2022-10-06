@@ -29,11 +29,14 @@
             {{ form.descripcion_consulta.label(class="form-label") }}
             {{ form.descripcion_consulta(class="form-control") }}
             <br/>
-            {{ form.id_doctor.label(class="form-label") }}
+            {{ form.id_doctor.label() }}
             {{ form.id_doctor(class="form-control") }}
             <br/>
-            {{ form.id_paciente.label(class="form-label") }}
+            {{ form.id_paciente.label() }}
             {{ form.id_paciente(class="form-control") }}
+            <br/>
+            {{ form.reserva_fecha_consulta.label() }}
+            {{ form.reserva_fecha_consulta() }}
             <br/>
             <br/>
             {{ form.submit(class="btn btn-primary") }}
@@ -46,6 +49,7 @@
                   <th scope="col">Descripción Consulta</th>
                   <th scope="col">Doctor</th>
                   <th scope="col">Paciente</th>
+                  <th scope="col">Fecha de reserva</th>
                   <th scope="col">Acción</th>
                 </tr>
               </thead>
@@ -54,8 +58,9 @@
                 {% for our_consultas in our_consultas %}
                   <th scope="row">{{ our_consultas.id_consulta }}</th>
                   <td>{{ our_consultas.descripcion_consulta }}</td>
-                  <td>{{ our_consultas.id_doctor }}</td>
-                  <td>{{ our_consultas.id_paciente }}</td>
+                  <td>{{ our_consultas.nombre_doc }}</td>
+                  <td>{{ our_consultas.nombre }}</td>
+                  <td>{{ our_consultas.reserva_fecha_consulta }}</td>
                   <td>
 
                       <a class="btn btn-primary" href="{{ url_for('update_consulta', id_consulta=our_consultas.id_consulta) }}">Update</a>
